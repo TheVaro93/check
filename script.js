@@ -3,7 +3,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const linkId = urlParams.get('id');
 
 
-const BACKEND_URL = "https://puny-apples-bow.loca.lt/";
+const BACKEND_URL = "https://tidy-bananas-own.loca.lt";
 
 if (!linkId) {
     document.getElementById('status').innerText = "err mauvais lien.";
