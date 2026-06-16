@@ -7,9 +7,12 @@ if (!linkId) {
     document.getElementById('status').innerText = "err mauvais lien.";
 } else {
     fetch(BACKEND_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id_lien: linkId })
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "any-value"
+        },
+        body: JSON.stringify(donnees)
     })
         .then(() => {
             document.getElementById('status').innerText = "Vérification réussie !";
