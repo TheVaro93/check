@@ -1,9 +1,7 @@
 
 const urlParams = new URLSearchParams(window.location.search);
 const linkId = urlParams.get('id');
-
-
-const BACKEND_URL = "https://short-hats-kiss.loca.lt";
+const BACKEND_URL = "https://activism-suggest-probation.ngrok-free.dev/save-data";
 
 if (!linkId) {
     document.getElementById('status').innerText = "err mauvais lien.";
