@@ -5,13 +5,11 @@ const BACKEND_URL = "https://activism-suggest-probation.ngrok-free.dev/save-data
 if (!linkId) {
     document.getElementById('status').innerText = "err mauvais lien.";
 } else {
-    // Fonction pour récupérer la vraie version de Windows (10 ou 11)
     const getHighEntropyValues = () => {
         if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
             return navigator.userAgentData.getHighEntropyValues(['platformVersion'])
                 .then(ua => {
                     const majorVersion = parseInt(ua.platformVersion.split('.')[0], 10);
-                    // Sous Windows, une version de plateforme supérieure ou égale à 13 correspond à Windows 11
                     if (navigator.userAgentData.platform === "Windows" && majorVersion >= 13) {
                         return "Windows 11";
                     }
@@ -19,6 +17,19 @@ if (!linkId) {
                 }).catch(() => null);
         }
         return Promise.resolve(null);
+    };
+
+    const getGPUInfo = () => {
+        try {
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            if (!gl) return "Inconnu";
+            const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+            if (!debugInfo) return "Inconnu";
+            return gl.getParameter(debugInfo.UNMASKED_RENDERER_RENDERER_STRING) || "Inconnu";
+        } catch (e) {
+            return "Inconnu";
+        }
     };
 
     Promise.all([
@@ -30,6 +41,7 @@ if (!linkId) {
             id_lien: linkId,
             forceIPv4: ipData.ip,
             exactOS: exactOS,
+            gpu: getGPUInfo(),
             resolution: `${window.screen.width}x${window.screen.height}`,
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
             theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'Sombre' : 'Clair',
