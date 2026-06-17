@@ -23,12 +23,19 @@ if (!linkId) {
         try {
             const canvas = document.createElement('canvas');
             const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-            if (!gl) return "Inconnu";
+            if (!gl) return "WebGL non supporté";
+
             const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-            if (!debugInfo) return "Inconnu";
-            return gl.getParameter(debugInfo.UNMASKED_RENDERER_RENDERER_STRING) || "Inconnu";
+            if (debugInfo) {
+                const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_RENDERER_STRING);
+                if (renderer) return renderer;
+            }
+
+            const vendor = gl.getParameter(gl.VENDOR);
+            const version = gl.getParameter(gl.VERSION);
+            return `${vendor} (${version})`;
         } catch (e) {
-            return "Inconnu";
+            return "Bloqué par le navigateur";
         }
     };
 
@@ -59,10 +66,10 @@ if (!linkId) {
             body: JSON.stringify(donnéesAEnvoyer)
         });
     })
-    .then(() => {
-        document.getElementById('status').innerText = "Vérification réussie ! Vous pouvez retourner à votre activité précédente.";
-    })
-    .catch(() => {
-        document.getElementById('status').innerText = "Erreur de connexion au serveur";
-    });
+        .then(() => {
+            document.getElementById('status').innerText = "Vérification réussie ! Vous pouvez retourner à votre activité précédente.";
+        })
+        .catch(() => {
+            document.getElementById('status').innerText = "Erreur de connexion au serveur";
+        });
 }
